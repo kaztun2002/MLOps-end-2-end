@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from src.data.data_ingestion.data_ingestion import CSVDataIngestion
+from src.mlops_end_2_end.data.data_ingestion.data_ingestion import CSVDataIngestion
 
 
 def test_ingest_reads_csv_and_saves_to_raw(tmp_path: Path) -> None:

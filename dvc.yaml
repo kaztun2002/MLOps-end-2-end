@@ -5,3 +5,59 @@ stages:
         - src/data/data_ingestion/data_ingestion.py
       outs:
         - data/raw/
+
+    data_cleaning:
+      cmd: python src/data/data_cleaning/data_cleaning_timeseries.py
+      deps:
+        - src/data/data_cleaning/data_cleaning_timeseries.py
+        - data/raw/
+      outs:
+        - data/cleaned/
+
+    data_preprocessing:
+      cmd: python src/data/data_preprocessing/data_preprocessing.py
+      deps:
+        - src/data/data_preprocessing/data_preprocessing.py
+        - data/processed/
+      outs:
+        - data/preprocessed/
+
+    feature_engineering:
+      cmd: python src/model/feature_engineering.py
+      deps:
+        - src/model/feature_engineering.py
+        - data/processed/
+      outs:
+        - data/engineered_features/
+
+    model_training:
+      cmd: python src/model/model_training.py
+      deps:
+        - src/model/model_training.py
+        - data/preprocessed/
+      outs:
+        - models/
+
+    model_explainer:
+      cmd: python src/model/model_explainer.py
+      deps:
+        - src/model/model_explainer.py
+        - models/
+      outs:
+        - explanations/
+
+    model_inference:
+      cmd: python src/model/model_inference.py
+      deps:
+        - src/model/model_inference.py
+        - models/
+      outs:
+        - predictions/
+
+    model_monitoring:
+      cmd: python src/model/model_monitoring.py
+      deps:
+        - src/model/model_monitoring.py
+        - predictions/
+      outs:
+        - monitoring_reports/
