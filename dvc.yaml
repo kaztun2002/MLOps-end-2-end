@@ -35,7 +35,7 @@ stages:
       - dvc_pipeline.py
       - src/mlops_end_2_end/model/feature_engineering.py
       - src/mlops_end_2_end/utils.py
-      - data/processed/cleaned_data.csv
+      - data/processed/preprocessed_data.csv
     outs:
       - data/engineered_features/engineered_features.csv
 
