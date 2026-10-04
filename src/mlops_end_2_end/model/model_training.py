@@ -41,7 +41,7 @@ class LightGBMModelTraining:
         self.model = None
         self.metrics = {}
 
-        self.trained_models_dir = f"{self.project_root}/models/trained"
+        self.trained_models_dir = self.project_root / "models" / "trained"
         self.trained_models_dir.mkdir(parents=True, exist_ok=True)
 
     def split_data(

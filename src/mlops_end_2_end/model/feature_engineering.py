@@ -24,7 +24,7 @@ class TimeSeriesFeatureEngineering:
 
         self.datetime_column = datetime_column
 
-        self.engineered_features_dir = f"{self.project_root}/data/engineered_features"
+        self.engineered_features_dir = self.project_root / "data" / "engineered_features"
         self.engineered_features_dir.mkdir(parents=True, exist_ok=True)
 
     def create_lag_features(

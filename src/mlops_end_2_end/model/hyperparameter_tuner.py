@@ -29,7 +29,7 @@ class LightGBMHyperparameterTuning:
             else Path.cwd()
         )
 
-        self.tuned_models_dir = f"{self.project_root}/models/tuned"
+        self.tuned_models_dir = self.project_root / "models" / "tuned"
         self.tuned_models_dir.mkdir(parents=True, exist_ok=True)
 
         self.n_trials = n_trials
@@ -105,11 +105,11 @@ class LightGBMHyperparameterTuning:
 
             predictions = model.predict(X_val)
 
-            rmse = mean_squared_error(
+            mse = mean_squared_error(
                 y_val,
                 predictions,
-                squared=False,
             )
+            rmse = mse ** 0.5
 
             scores.append(rmse)
 

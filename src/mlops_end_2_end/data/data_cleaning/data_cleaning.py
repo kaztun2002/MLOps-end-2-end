@@ -16,7 +16,7 @@ class DataCleaning:
         )
  
         self.logger.info("Data cleaning initialized with project root: %s", self.project_root)
-        self.processed_data_dir = f"{self.project_root}/data/processed"
+        self.processed_data_dir = self.project_root / "data" / "processed"
         self.processed_data_dir.mkdir(parents=True, exist_ok=True)
 
     def remove_duplicates(self, df: pd.DataFrame) -> pd.DataFrame:

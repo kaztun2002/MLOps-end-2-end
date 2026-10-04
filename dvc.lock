@@ -1,0 +1,220 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: uv run --no-sync python dvc_pipeline.py data_ingestion
+    deps:
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: notebooks/sales_timeseries_2025.csv
+      hash: md5
+      md5: d32c32e064776802d217cf238f51d578
+      size: 21736
+    - path: src/mlops_end_2_end/data/data_ingestion/data_ingestion.py
+      hash: md5
+      md5: b048b200720ee4881869437d4dcc9efa
+      size: 2745
+    - path: src/mlops_end_2_end/utils.py
+      hash: md5
+      md5: 29942a754c8ea604dbe9ea2c345d2fbc
+      size: 1378
+    outs:
+    - path: data/raw/sales_timeseries_2025.csv
+      hash: md5
+      md5: e107608c55bf14984a47e6679ba9062c
+      size: 21705
+  data_cleaning:
+    cmd: uv run --no-sync python dvc_pipeline.py data_cleaning
+    deps:
+    - path: data/raw/sales_timeseries_2025.csv
+      hash: md5
+      md5: e107608c55bf14984a47e6679ba9062c
+      size: 21705
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: src/mlops_end_2_end/data/data_cleaning/data_cleaning_timeseries.py
+      hash: md5
+      md5: baea16fa20a3979529c7ef5506e0068e
+      size: 4564
+    - path: src/mlops_end_2_end/utils.py
+      hash: md5
+      md5: 29942a754c8ea604dbe9ea2c345d2fbc
+      size: 1378
+    outs:
+    - path: data/processed/cleaned_data.csv
+      hash: md5
+      md5: e107608c55bf14984a47e6679ba9062c
+      size: 21705
+  data_preprocessing:
+    cmd: uv run --no-sync python dvc_pipeline.py data_preprocessing
+    deps:
+    - path: data/processed/cleaned_data.csv
+      hash: md5
+      md5: e107608c55bf14984a47e6679ba9062c
+      size: 21705
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: src/mlops_end_2_end/data/data_preprocessing/data_preprocessing.py
+      hash: md5
+      md5: ae59cb8291f2f13d45b36cefcb85e393
+      size: 2394
+    - path: src/mlops_end_2_end/utils.py
+      hash: md5
+      md5: 29942a754c8ea604dbe9ea2c345d2fbc
+      size: 1378
+    outs:
+    - path: data/processed/preprocessed_data.csv
+      hash: md5
+      md5: c5857ad04bd4f7cfdfb7a4358f096031
+      size: 867912
+  feature_engineering:
+    cmd: uv run --no-sync python dvc_pipeline.py feature_engineering
+    deps:
+    - path: data/processed/cleaned_data.csv
+      hash: md5
+      md5: e107608c55bf14984a47e6679ba9062c
+      size: 21705
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: src/mlops_end_2_end/model/feature_engineering.py
+      hash: md5
+      md5: a589f8c08e9e289539daf6c95e72f4ab
+      size: 3889
+    - path: src/mlops_end_2_end/utils.py
+      hash: md5
+      md5: 29942a754c8ea604dbe9ea2c345d2fbc
+      size: 1378
+    outs:
+    - path: data/engineered_features/engineered_features.csv
+      hash: md5
+      md5: 2d1242c7c92a48a334cde32c4d4167f8
+      size: 72459
+  model_training:
+    cmd: uv run --no-sync python dvc_pipeline.py model_training
+    deps:
+    - path: data/engineered_features/engineered_features.csv
+      hash: md5
+      md5: 2d1242c7c92a48a334cde32c4d4167f8
+      size: 72459
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: src/mlops_end_2_end/model/model_training.py
+      hash: md5
+      md5: 0cf8b77aaa5f75fd9822f8ce9d1b339f
+      size: 4607
+    - path: src/mlops_end_2_end/utils.py
+      hash: md5
+      md5: 29942a754c8ea604dbe9ea2c345d2fbc
+      size: 1378
+    params:
+      params.yaml:
+        hyperparameter.colsample_bytree: 0.9
+        hyperparameter.learning_rate: 0.05
+        hyperparameter.max_depth: -1
+        hyperparameter.n_estimators: 300
+        hyperparameter.num_leaves: 31
+        hyperparameter.random_seed: 42
+        hyperparameter.reg_alpha: 0.1
+        hyperparameter.reg_lambda: 0.1
+        hyperparameter.subsample: 0.9
+        hyperparameter.train_fraction: 0.8
+    outs:
+    - path: models/trained/lightgbm_model.pkl
+      hash: md5
+      md5: 8d5160c127e0d27ffa009031317fdd64
+      size: 95571
+    - path: reports/training_metrics.json
+      hash: md5
+      md5: 3ab62bd7d1a16691cbc5c229b18e54a1
+      size: 95
+  model_explainer:
+    cmd: uv run --no-sync python dvc_pipeline.py model_explainer
+    deps:
+    - path: data/engineered_features/engineered_features.csv
+      hash: md5
+      md5: 2d1242c7c92a48a334cde32c4d4167f8
+      size: 72459
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: models/trained/lightgbm_model.pkl
+      hash: md5
+      md5: 8d5160c127e0d27ffa009031317fdd64
+      size: 95571
+    - path: src/mlops_end_2_end/model/model_explainer.py
+      hash: md5
+      md5: e360dbdcbf617acc22988f720c8725df
+      size: 3423
+    - path: src/mlops_end_2_end/model/model_training.py
+      hash: md5
+      md5: 0cf8b77aaa5f75fd9822f8ce9d1b339f
+      size: 4607
+    outs:
+    - path: reports/explanations/
+      hash: md5
+      md5: ffcf184f7fa5aeef7e109e3018181f49.dir
+      size: 130670
+      nfiles: 2
+  model_inference:
+    cmd: uv run --no-sync python dvc_pipeline.py model_inference
+    deps:
+    - path: data/engineered_features/engineered_features.csv
+      hash: md5
+      md5: 2d1242c7c92a48a334cde32c4d4167f8
+      size: 72459
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: models/trained/lightgbm_model.pkl
+      hash: md5
+      md5: 8d5160c127e0d27ffa009031317fdd64
+      size: 95571
+    - path: src/mlops_end_2_end/model/model_inference.py
+      hash: md5
+      md5: 1f9e9b93fe63356df44e49b4507e71f2
+      size: 2440
+    outs:
+    - path: data/predictions/predictions.csv
+      hash: md5
+      md5: 12404ca4ff7b4e8af5277dfcb7c3b2fb
+      size: 13683
+  model_monitoring:
+    cmd: uv run --no-sync python dvc_pipeline.py model_monitoring
+    deps:
+    - path: data/engineered_features/engineered_features.csv
+      hash: md5
+      md5: 2d1242c7c92a48a334cde32c4d4167f8
+      size: 72459
+    - path: dvc_pipeline.py
+      hash: md5
+      md5: e72e4b93b270314820a19b199d6bb83b
+      size: 6205
+    - path: models/trained/lightgbm_model.pkl
+      hash: md5
+      md5: 8d5160c127e0d27ffa009031317fdd64
+      size: 95571
+    - path: src/mlops_end_2_end/model/model_monitoring.py
+      hash: md5
+      md5: 77175342f447cb42e3d0a1942a8c4692
+      size: 26671
+    - path: src/mlops_end_2_end/utils.py
+      hash: md5
+      md5: 29942a754c8ea604dbe9ea2c345d2fbc
+      size: 1378
+    outs:
+    - path: reports/monitoring/
+      hash: md5
+      md5: 4dcd1d380f699f9e8bf9c10e597f146a.dir
+      size: 48422389
+      nfiles: 13

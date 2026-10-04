@@ -16,7 +16,7 @@ class DataPreprocessing:
             Path(project_root) if project_root is not None else Path.cwd()
         )
 
-        self.processed_data_dir = f"{self.project_root}/data/processed"
+        self.processed_data_dir = self.project_root / "data" / "processed"
         self.processed_data_dir.mkdir(parents=True, exist_ok=True)
 
     def to_categorical(self, df: pd.DataFrame) -> pd.DataFrame:

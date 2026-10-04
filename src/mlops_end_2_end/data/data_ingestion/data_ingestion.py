@@ -29,7 +29,7 @@ class DataIngestion:
         """
         self.logger = get_logger("data_ingestion")
         self.project_root = Path(project_root) if project_root is not None else Path.cwd()
-        self.raw_data_dir = f"{self.project_root}/data/raw"
+        self.raw_data_dir = Path(f"{self.project_root}/data/raw")
 
     def is_url(self, path: str) -> bool:
         """Check if the given path is a URL."""
