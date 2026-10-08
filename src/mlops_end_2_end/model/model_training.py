@@ -61,6 +61,12 @@ class LightGBMModelTraining:
 
         split_index = int(len(df) * self.train_size)
 
+        # Split data using datetime to ensure chronological order
+        # train_end_date = "train_end_date"  # Placeholder for actual date calculation
+        # train_df = df[df["date"] <= train_end_date].copy()
+        # validation_df = df[df["date"] > train_end_date].copy()
+
+        # Split the data into training and validation sets
         train_df = df.iloc[:split_index].copy()
         validation_df = df.iloc[split_index:].copy()
 

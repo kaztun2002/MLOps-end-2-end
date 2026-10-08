@@ -35,6 +35,13 @@ class TimeSeriesFeatureEngineering:
     ) -> pd.DataFrame:
         """Create lag features from previous observations."""
 
+        # # for multiple timeseries, you might want to group by an identifier column before creating lag features.
+        # df = df.sort_values(["store_id", "product_id", "date"])
+        # group = df.groupby("col_1", "col_2", ...)
+        # df["lag_1"] = group.shift(1)
+        # df["lag_7"] = group.shift(7)
+        # df["lag_14"] = group.shift(14)
+
         df = df.copy()
 
         for lag in lags:
@@ -56,7 +63,11 @@ class TimeSeriesFeatureEngineering:
     ) -> pd.DataFrame:
         """Create rolling statistical features using past observations."""
 
-        df = df.copy()
+        # df = df.copy()
+
+        # df["rolling_mean_7"] = (
+        # df.groupby(["store_id", "product_id"])["sales"]
+        # .transform(lambda x: x.shift(1).rolling(7).mean()))
 
         for window in windows:
             # Shift first to prevent data leakage.
