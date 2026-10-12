@@ -36,8 +36,6 @@ class DataCleaning:
                 f"Datetime column '{self.datetime_column}' not found."
             )
 
-        df = df.copy()
-
         df[self.datetime_column] = pd.to_datetime(
             df[self.datetime_column],
             errors="coerce",
@@ -122,7 +120,7 @@ class DataCleaning:
 
         before = len(df)
 
-        df = df.drop_duplicates().copy()
+        df = df.drop_duplicates()
 
         self.logger.info(
             "Removed %d duplicate rows",
@@ -136,8 +134,6 @@ class DataCleaning:
         df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Handle missing feature values."""
-
-        df = df.copy()
 
         numeric_columns = df.select_dtypes(
             include="number"

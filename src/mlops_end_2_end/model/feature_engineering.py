@@ -4,6 +4,7 @@ from typing import Union
 import pandas as pd
 
 from mlops_end_2_end.utils import get_logger
+from sqlalchemy import column
 
 
 class TimeSeriesFeatureEngineering:
@@ -36,16 +37,19 @@ class TimeSeriesFeatureEngineering:
         """Create lag features from previous observations."""
 
         # # for multiple timeseries, you might want to group by an identifier column before creating lag features.
-        # df = df.sort_values(["store_id", "product_id", "date"])
-        # group = df.groupby("col_1", "col_2", ...)
-        # df["lag_1"] = group.shift(1)
-        # df["lag_7"] = group.shift(7)
-        # df["lag_14"] = group.shift(14)
-
-        df = df.copy()
+        # df = df.sort_values(["store_id", "product_id", "date"]).reset_index(drop=True)
+        # grouped_column = df.groupby(["store_id", "product_id"])[column]
+        # for lag in lags:
+        #     # Compute the lag dynamically per group using transform
+        #     df[f"{column}_lag_{lag}"] = grouped_column.transform(
+        #         lambda x: x.shift(lag)
+        #     )
+        # df = df.dropna().reset_index(drop=True)
 
         for lag in lags:
             df[f"{column}_lag_{lag}"] = df[column].shift(lag)
+
+        df = df.dropna().reset_index(drop=True)
 
         self.logger.info(
             "Created lag features for %s: %s",
@@ -63,12 +67,21 @@ class TimeSeriesFeatureEngineering:
     ) -> pd.DataFrame:
         """Create rolling statistical features using past observations."""
 
-        # df = df.copy()
+        # df = df.sort_values(["store_id", "product_id", "date"]).reset_index(drop=True)
+        # grouped_sales = df.groupby(["store_id", "product_id"])["sales"]
 
-        # df["rolling_mean_7"] = (
-        # df.groupby(["store_id", "product_id"])["sales"]
-        # .transform(lambda x: x.shift(1).rolling(7).mean()))
-
+        # for window in windows:
+        #     # 1. Compute rolling mean dynamically per group
+        #     df[f"sales_rolling_mean_{window}"] = grouped_sales.transform(
+        #         lambda x: x.shift(1).rolling(window).mean()
+        #     )
+            
+        #     # 2. Compute rolling standard deviation dynamically per group
+        #     df[f"sales_rolling_std_{window}"] = grouped_sales.transform(
+        #         lambda x: x.shift(1).rolling(window).std()
+        #     )
+        # df = df.dropna().reset_index(drop=True)
+        
         for window in windows:
             # Shift first to prevent data leakage.
             previous_values = df[column].shift(1)
@@ -80,6 +93,7 @@ class TimeSeriesFeatureEngineering:
             df[f"{column}_rolling_std_{window}"] = (
                 previous_values.rolling(window).std()
             )
+        df = df.dropna().reset_index(drop=True)
 
         self.logger.info(
             "Created rolling features for %s: %s",
@@ -94,8 +108,6 @@ class TimeSeriesFeatureEngineering:
         df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Create calendar-based features."""
-
-        df = df.copy()
 
         df[self.datetime_column] = pd.to_datetime(
             df[self.datetime_column]
@@ -125,8 +137,6 @@ class TimeSeriesFeatureEngineering:
         lags = lags or [1, 7, 14, 28]
         rolling_windows = rolling_windows or [7, 14, 28]
 
-        df = df.copy()
-
         # Ensure chronological order
         df = df.sort_values(
             self.datetime_column
@@ -147,6 +157,15 @@ class TimeSeriesFeatureEngineering:
             df=df,
             column=target_column,
             windows=rolling_windows,
+        )
+
+        pre_drop_len = len(df)
+        df = df.dropna().reset_index(drop=True)
+        post_drop_len = len(df)
+
+        self.logger.info(
+            "Dropped %d rows with NaN values after feature engineering",
+            pre_drop_len - post_drop_len,
         )
 
         df.to_csv(f"{self.engineered_features_dir}/engineered_features.csv", index=False)
